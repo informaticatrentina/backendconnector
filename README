@@ -1,0 +1,84 @@
+Backend connector
+=================
+
+The main objective of Backend connector is reusability and better management of
+code. It contain files that are common in multiple project.  
+:author: The contest and grant Developer Team http://www.incaendo.com
+
+
+Component 
+---------
+
+It include several component that are common in multiple project.
+1. Aggregator manager and api
+2. Identity manager and api
+3. commands  
+
+
+Installation
+------------
+
+To setup backend connector you have to follow some steps mentioned below:
+
+1. Checkout source code from repository and put into /protected/modules
+   (git@git.ahref.eu:lib/backendconnector.git)::
+
+
+CONFIGURATION
+-------------
+
+Configuration changes is to be done in config.php and console.php
+ 1. Change in config/config.php - import files of backend connector
+    ex.  array ('import' => array(
+                               'application.modules.backendconnector.components.*',
+                               'application.modules.backendconnector.commands.*'
+                             )
+
+ 2. Change in config/console.php -  Console related changes is to be done in
+    console.php. Add all commands in console.php using command map. 
+    ex. 'commandMap' => array(
+                    'generatedumpCommand' => array (
+                      'class' => 'application.modules.backendconnector.commands.GeneratedumpCommand'
+                    )
+           )  
+
+ 3. AGGREGATOR_API_URL The complete API url of aggregator (which contains
+       api key also)
+
+ 4. IDENTITY_MANAGER_API_URL The API url of identity manager installation
+       this site will use.
+
+ 5. IDM_API_KEY API key of identity manager.
+
+ 6. RESPONSE_FORMAT  The format of response from aggregator (json).
+
+ 7. CURL_TIMEOUT The time out for curl request.
+
+ 8. DEFAULT_LIMIT  The limit of entry in get method.
+
+ 9. SOURCE   The source name (source name for project ).
+
+ 10. DEFAULT_OFFSET The default offset of entries.
+
+ 11. USER_GENERATED_DIRECTORY The name of user generated directory for dump.  
+
+Requirements
+------------
+
+Backend connector is developed on yii framework So all requirements of yii
+framework must be fulfilled:
+
+The minimum requirement by Yii is that your Web server supports PHP 5.1.0 or
+above.
+
+Please access the following URL to check if your Web server reaches the
+requirements by Yii, assuming "YiiPath" is where Yii is installed.
+
+
+Dependency List
+---------------
+
+PHP packages need to be installed are
+        1. php5-cli
+        2. php5-curl
+        3. php5-mysql
