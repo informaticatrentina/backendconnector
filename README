@@ -42,25 +42,32 @@ Configuration changes is to be done in config.php and console.php
                     )
            )  
 
- 3. AGGREGATOR_API_URL The complete API url of aggregator (which contains
+ 3. Add in config file 
+      'modules'=>array(
+        'backendconnector'
+      )
+
+ 4. AGGREGATOR_API_URL The complete API url of aggregator (which contains
        api key also)
 
- 4. IDENTITY_MANAGER_API_URL The API url of identity manager installation
+ 5. IDENTITY_MANAGER_API_URL The API url of identity manager installation
        this site will use.
 
- 5. IDM_API_KEY API key of identity manager.
+ 6. IDM_API_KEY API key of identity manager.
+ 
+ 7. IDM_USER_ENTITY The name of user entity (users).
 
- 6. RESPONSE_FORMAT  The format of response from aggregator (json).
+ 8. RESPONSE_FORMAT  The format of response from aggregator (json).
 
- 7. CURL_TIMEOUT The time out for curl request.
+ 9. CURL_TIMEOUT The time out for curl request.
 
- 8. DEFAULT_LIMIT  The limit of entry in get method.
+ 10. DEFAULT_LIMIT  The limit of entry in get method.
 
- 9. SOURCE   The source name (source name for project ).
+ 11. SOURCE  The source name (source name for project ).
 
- 10. DEFAULT_OFFSET The default offset of entries.
+ 12. DEFAULT_OFFSET The default offset of entries.
 
- 11. USER_GENERATED_DIRECTORY The name of user generated directory for dump.  
+ 13. USER_GENERATED_DIRECTORY The name of user generated directory for dump.  
 
 Requirements
 ------------
@@ -82,3 +89,4 @@ PHP packages need to be installed are
         1. php5-cli
         2. php5-curl
         3. php5-mysql
+
