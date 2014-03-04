@@ -20,21 +20,23 @@ Installation
 
 To setup backend connector you have to follow some steps mentioned below:
 
-1. Checkout source code from repository and put into /protected/modules
+1. Checkout source code from repository and put into /protected/modules directory 
+   of your project
    (git@git.ahref.eu:lib/backendconnector.git)::
 
 
 CONFIGURATION
 -------------
 
-Configuration changes is to be done in config.php and console.php
- 1. Change in config/config.php - import files of backend connector
+Configuration changes is to be done in config.php and console.php of project.
+
+ 1. Change in config/config.php of project - import files of backend connector
     ex.  array ('import' => array(
                                'application.modules.backendconnector.components.*',
                                'application.modules.backendconnector.commands.*'
                              )
 
- 2. Change in config/console.php -  Console related changes is to be done in
+ 2. Change in config/console.php of project -  Console related changes is to be done in
     console.php. Add all commands in console.php using command map. 
     ex. 'commandMap' => array(
                     'generatedumpCommand' => array (
@@ -42,10 +44,12 @@ Configuration changes is to be done in config.php and console.php
                     )
            )  
 
- 3. Add in config file 
+ 3. Add in config file of project 
       'modules'=>array(
         'backendconnector'
       )
+
+All constant listed below is defined in local config of your project.
 
  4. AGGREGATOR_API_URL The complete API url of aggregator (which contains
        api key also)
@@ -69,6 +73,7 @@ Configuration changes is to be done in config.php and console.php
 
  13. USER_GENERATED_DIRECTORY The name of user generated directory for dump.  
 
+
 Requirements
 ------------
 
@@ -89,4 +94,3 @@ PHP packages need to be installed are
         1. php5-cli
         2. php5-curl
         3. php5-mysql
-
