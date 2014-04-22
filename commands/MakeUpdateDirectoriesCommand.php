@@ -23,7 +23,13 @@ class MakeUpdateDirectoriesCommand extends CConsoleCommand {
       if (posix_getpwnam($user) == FALSE) {
         die( "$user user does not exist in system \n");
       }
-      $path = Yii::app()->basePath . '/runtime';
+      if (!defined('RUNTIME_DIRECTORY')) {
+        die('Please define RUNTIME_DIRECTORY constant in local_config.');
+      }
+      $path = RUNTIME_DIRECTORY;
+      if (!is_dir($path)) {
+        mkdir($path);
+      }
       $this->recursiveChown($path, $user);
       $assests = Yii::app()->basePath . '/../assets';
       if (!is_dir($assests)) {
