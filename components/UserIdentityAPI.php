@@ -32,9 +32,19 @@ class UserIdentityAPI {
   function getUserDetail($function, $params = array()) {
     $userDetail = array();
     try {
-      $param = 'where={"email":"'.$params['email'].'","password":"'.$params['password'].'"}';
-      if (!empty($params)) {
-        $this->url = $this->baseUrl . $function .'/?'. $param;
+      $userParam = array();
+      if (array_key_exists('email', $params) && !empty($params['email'])) {
+        $userParam['email'] = $params['email'];
+      }
+      if (array_key_exists('password', $params) && !empty($params['password'])) {
+        $userParam['password'] = $params['password'];
+      }
+      if (array_key_exists('id', $params) && !empty($params['id'])) {
+        $userParam['_id'] = $params['id'];
+      }
+      if (!empty($userParam)) {
+        $userParam = 'where=' . json_encode($userParam);
+        $this->url = $this->baseUrl . $function .'/?'. $userParam;
       } 
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->url);
