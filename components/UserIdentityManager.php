@@ -50,7 +50,7 @@ class UserIdentityManager extends CFormModel{
         $saveUser['id'] = $response['user']['_id'];
         $saveUser['msg'] = 'You have successfully created your account';
         $saveUser['success'] = true;
-      } else {    
+      } else {
         $message = 'Please try again';
         if (array_key_exists('user', $response) &&  $response['user']['status'] == 'ERR') {
           $message = $response['user']['issues'][0];
@@ -126,6 +126,45 @@ class UserIdentityManager extends CFormModel{
     } catch (Exception $e) {      
       $userStatus['msg'] = $e->getMessage();
       Yii::log('', 'error', 'Error in validateUser method :' . $e->getMessage());      
+    }
+    return $userStatus;
+  }
+  
+  /**
+   * setUserDetailInSession
+   * 
+   * This function is used for getting information by userid and store it in session.
+   * @param (string) $userId
+   * @return (array) $userStatus
+   */
+  public function setUserDetailInSession($userId) {
+    $user = new UserIdentityAPI();
+    $userStatus = $user->getUserInfo(IDM_USER_ENTITY, $userId);
+    if (array_key_exists('success', $userStatus) && empty($userStatus['success'])) {
+      $userStatus['msg'] = 'Some technical problem occurred, contact administrator';
+    } else {
+      Yii::app()->session->open();
+      $user = array();
+      if (array_key_exists('firstname', $userStatus) && !empty($userStatus['firstname'])) {
+        $user['firstname'] = $userStatus['firstname'];
+      }
+      if (array_key_exists('lastname', $userStatus) && !empty($userStatus['lastname'])) {
+        $user['lastname'] = $userStatus['lastname'];
+      }
+      if (array_key_exists('email', $userStatus) && !empty($userStatus['email'])) {
+        $user['email'] = $userStatus['email'];
+      }
+      if (array_key_exists('created', $userStatus) && !empty($userStatus['created'])) {
+        $user['creationDate'] = $userStatus['created'];
+      }
+      if (array_key_exists('etag', $userStatus) && !empty($userStatus['etag'])) {
+        $user['etag'] = $userStatus['etag'];
+      }
+      if (array_key_exists('_id', $userStatus) && !empty($userStatus['_id'])) {
+        $user['id'] = $userStatus['_id'];
+      }
+      Yii::app()->session['user'] = $user;
+      $userStatus['success'] = true;
     }
     return $userStatus;
   }
