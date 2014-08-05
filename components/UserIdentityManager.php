@@ -35,14 +35,10 @@ class UserIdentityManager extends CFormModel{
       }
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Please enter a valid email');
-      } else {
-        $userDetail['email'] = urldecode($userDetail['email']);
-      }
+      } 
       if (empty($userDetail['password'])) {
         throw new Exception('Please enter password');
-      } else {
-        $userDetail['password'] = urldecode($userDetail['password']);
-      }
+      } 
        
       $user = new UserIdentityAPI();
       $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
@@ -84,12 +80,12 @@ class UserIdentityManager extends CFormModel{
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Please enter a valid email');
       } else {
-        $userDetail['email'] = $userDetail['email'];
+        $userDetail['email'] = urlencode($userDetail['email']);
       }
       if (empty($userDetail['password'])) {
         throw new Exception('Please enter password');
       } else {
-        $userDetail['password'] = $userDetail['password'];
+        $userDetail['password'] = urlencode($userDetail['password']);
       }
       $user = new UserIdentityAPI();
       $userStatus = $user->getUserDetail(IDM_USER_ENTITY, $userDetail);
