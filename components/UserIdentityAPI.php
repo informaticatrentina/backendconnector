@@ -88,7 +88,7 @@ class UserIdentityAPI {
     $return = array();
     try {
       if (!empty($params)) {
-        $data = 'user=' . json_encode($params);
+        $data = http_build_query($params);
         $this->url = $this->baseUrl . $function .'/';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);

@@ -1,4 +1,4 @@
-  <?php
+<?php
 
 /**
  * UserIdentityManager
@@ -25,7 +25,7 @@ class UserIdentityManager extends CFormModel{
   public function createUser($userDetail) {
     $saveUser = array();
     $response = array();
-     $saveUser['success'] = false;
+    $saveUser['success'] = false;
     try {
       if (empty($userDetail['firstname'])) {
         throw new Exception('Please enter first name');
@@ -36,35 +36,35 @@ class UserIdentityManager extends CFormModel{
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Please enter a valid email');
       } else {
-        $userDetail['email'] = urlencode($userDetail['email']);
+        $userDetail['email'] = urldecode($userDetail['email']);
       }
       if (empty($userDetail['password'])) {
         throw new Exception('Please enter password');
       } else {
-        $userDetail['password'] = urlencode($userDetail['password']);
+        $userDetail['password'] = urldecode($userDetail['password']);
       }
        
       $user = new UserIdentityAPI();
-      $response = $user->createUser(IDM_USER_ENTITY, $userDetail);   
-      if (array_key_exists('user', $response) &&  $response['user']['status'] == 'OK') {
-        $saveUser['id'] = $response['user']['_id'];
+      $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
+      if (array_key_exists('status', $response) &&  $response['status'] == 'OK') {
+        $saveUser['id'] = $response['_id'];
         $saveUser['msg'] = 'You have successfully created your account';
         $saveUser['success'] = true;
       } else {
         $message = 'Please try again';
-        if (array_key_exists('user', $response) &&  $response['user']['status'] == 'ERR') {
-          $message = $response['user']['issues'][0];
+        if (array_key_exists('status', $response) &&  $response['status'] == 'ERR') {
+          $message = $response['issues'][0];
           if (strpos($message, "field 'email' not unique") !== false) {
-              $message = 'Email id already in use, Please choose a different email id';
+            $message = 'Email id already in use, Please choose a different email id';
           } else {
-              $message = 'Some technical problem occurred, contact administrator';
+            $message = 'Some technical problem occurred, contact administrator';
           }
         }
         $saveUser['msg'] = $message;
       }
     } catch (Exception $e) {
       $saveUser['msg'] = $e->getMessage();
-      Yii::log('', 'error', 'Error in createUser method :' . $e->getMessage());
+      Yii::log($e->getMessage(), 'error', 'Error in createUser method ' );
     }
     return $saveUser;
   }
