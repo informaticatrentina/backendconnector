@@ -29,7 +29,7 @@ class UserIdentityAPI {
    * @param (string) $function
    * @return (array) $userDetail
    */
-  function getUserDetail($function, $params = array()) {
+  function getUserDetail($function, $params = array(), $email = false, $id = false) {
     $userDetail = array();
     try {
       $userParam = array();
@@ -40,10 +40,22 @@ class UserIdentityAPI {
         $userParam['password'] = $params['password'];
       }
       if (array_key_exists('id', $params) && !empty($params['id'])) {
-        $userParam['_id'] = $params['id'];
+        if (is_array($params['id'])) {
+          foreach ($params['id'] as $userId) {
+            $userParam['$or'][] = array('_id' => $userId);
+          }
+        } else {
+          $userParam['_id'] = $params['id'];
+        }
+      }
+      $projection = '';
+      if ($id) {
+        $projection = '&projection={"_id":1}';
+      } else if ($email) {
+        $projection = '&projection={"email":1}';
       }
       if (!empty($userParam)) {
-        $userParam = 'where=' . json_encode($userParam);
+        $userParam = 'where=' . json_encode($userParam) . $projection;
         $this->url = $this->baseUrl . $function .'/?'. $userParam;
       } 
       $ch = curl_init();
