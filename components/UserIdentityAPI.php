@@ -100,7 +100,7 @@ class UserIdentityAPI {
     $return = array();
     try {
       if (!empty($params)) {
-        $data = http_build_query($params);
+        $data = 'user=' . json_encode($params);
         $this->url = $this->baseUrl . $function .'/';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -125,6 +125,9 @@ class UserIdentityAPI {
           throw new Exception('Zero length response not permitted');
         }
         $return = json_decode(strstr($this->response, "{"), true);
+        if (array_key_exists('user', $return)) {
+          $return = $return['user'];
+        }
       }
     } catch (Exception $e) {
       Yii::log('', 'error', 'Error in createUser :' . $e->getMessage());
