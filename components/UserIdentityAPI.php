@@ -117,7 +117,7 @@ class UserIdentityAPI {
         $headers = curl_getinfo($ch);
         curl_close($ch);
         //Manage uncorrect response 
-        if ($headers['http_code'] != 200) {
+       if ($headers['http_code'] != 200 && $headers['http_code'] != 201) {
           throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
         } elseif (!$this->response) {
           throw new Exception('Identitity Manager  is not responding or Curl failed');
@@ -186,7 +186,7 @@ class UserIdentityAPI {
     try {
       if (!empty($params)) {
         $data = http_build_query($params);
-        $this->url = $this->baseUrl . $function .'/';
+        $this->url = $this->baseUrl . $function .'/' . $params['id'] . '/' ;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
