@@ -100,7 +100,7 @@ class UserIdentityAPI {
     $return = array();
     try {
       if (!empty($params)) {
-        $data = 'user=' . json_encode($params);
+        $data = http_build_query($params);
         $this->url = $this->baseUrl . $function .'/';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -125,9 +125,6 @@ class UserIdentityAPI {
           throw new Exception('Zero length response not permitted');
         }
         $return = json_decode(strstr($this->response, "{"), true);
-        if (array_key_exists('user', $return)) {
-          $return = $return['user'];
-        }
       }
     } catch (Exception $e) {
       Yii::log('', 'error', 'Error in createUser :' . $e->getMessage());
@@ -182,5 +179,44 @@ class UserIdentityAPI {
       $userDetail['data'] = '';
     }
     return $userDetail;
+  }
+
+  public function curlPut ($function, $params = array()) {
+    $out = array();
+    try {
+      if (!empty($params)) {
+        $data = http_build_query($params);
+        $this->url = $this->baseUrl . $function .'/';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->url);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
+          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
+
+        $this->response = curl_exec($ch);
+        $headers = curl_getinfo($ch);
+        curl_close($ch);
+        if ($headers['http_code'] != 200) {
+          throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
+        } elseif (!$this->response) {
+          throw new Exception('Identitity Manager  is not responding or Curl failed');
+        } elseif (strlen($this->response) == 0) {
+          throw new Exception('Zero length response not permitted');
+        }
+        $out = json_decode(strstr($this->response, "{"), true);
+      }
+    } catch (Exception $e) {
+      Yii::log('', ERROR, Yii::t('contest','Error in curlPut :') . $e->getMessage());
+      $out['success'] = false;
+      $out['msg'] = $e->getMessage();
+      $out['data'] = '';
+    }
+    return $out;
   }
 }
