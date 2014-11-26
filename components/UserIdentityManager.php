@@ -42,13 +42,13 @@ class UserIdentityManager extends CFormModel{
        
       $user = new UserIdentityAPI();
       $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
-      if (array_key_exists('status', $response) &&  $response['status'] == 'OK') {
+      if (array_key_exists('_status', $response) &&  $response['_status'] == 'OK') {
         $saveUser['id'] = $response['_id'];
         $saveUser['msg'] = 'You have successfully created your account';
         $saveUser['success'] = true;
       } else {
         $message = 'Please try again';
-        if (array_key_exists('status', $response) &&  $response['status'] == 'ERR') {
+        if (array_key_exists('_status', $response) &&  $response['_status'] == 'ERR') {
           $message = $response['issues'][0];
           if (strpos($message, "field 'email' not unique") !== false) {
             $message = 'Email id already in use, Please choose a different email id';
@@ -163,6 +163,15 @@ class UserIdentityManager extends CFormModel{
       $userStatus['success'] = true;
     }
     return $userStatus;
+  }
+  
+  public function curlPut($email) {
+    $userIdentityApi = new UserIdentityManager();
+        $inputParam = array(
+          'status' => 1,
+          'email' => $email
+        );
+        return $userIdentityApi->curlPut($inputParam);
   }
 }
 ?>

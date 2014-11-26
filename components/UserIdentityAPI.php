@@ -185,8 +185,9 @@ class UserIdentityAPI {
     $out = array();
     try {
       if (!empty($params)) {
-        $data = http_build_query($params);
         $this->url = $this->baseUrl . $function .'/' . $params['id'] . '/' ;
+        unset( $params['id'] );
+        $data = http_build_query($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
