@@ -95,6 +95,9 @@ class UserIdentityManager extends CFormModel{
         if (empty($userStatus['_items'])) {
           $userStatus['msg'] = 'You have entered either wrong email id or password. Please try again';
         } else {
+          if (array_key_exists('status', $userStatus['_items'][0]) && $userStatus['_items'][0]['status'] == 0) {
+            throw new Exception(Yii::t('discussion', 'Please activate you account'));
+          }
           Yii::app()->session->open();
           $user = array();
           if (array_key_exists('firstname', $userStatus['_items'][0]) && !empty($userStatus['_items'][0]['firstname'])) {
@@ -172,6 +175,6 @@ class UserIdentityManager extends CFormModel{
           'email' => $email
         );
         return $userIdentityApi->curlPut($inputParam);
+    }
   }
-}
 ?>
