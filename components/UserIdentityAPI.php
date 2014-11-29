@@ -66,7 +66,7 @@ class UserIdentityAPI {
       ));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
-      
+
       $this->response = curl_exec($ch);
       $headers = curl_getinfo($ch);
       curl_close($ch);
@@ -106,19 +106,19 @@ class UserIdentityAPI {
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
-              "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+              "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')    
         ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
-        
+
         $this->response = curl_exec($ch);
         $headers = curl_getinfo($ch);
         curl_close($ch);
         //Manage uncorrect response 
-       if ($headers['http_code'] != 200 && $headers['http_code'] != 201) {
-          throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
+       if ($headers['http_code'] != 200 && $headers['http_code'] != 201 && $headers['http_code'] != 400) {
+         throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
         } elseif (!$this->response) {
           throw new Exception('Identitity Manager  is not responding or Curl failed');
         } elseif (strlen($this->response) == 0) {
@@ -187,12 +187,13 @@ class UserIdentityAPI {
       if (!empty($params)) {
         $this->url = $this->baseUrl . $function .'/' . $params['id'] . '/' ;
         unset( $params['id'] );
-        $data = http_build_query($params);
+        $data = json_encode($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
-          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':'),
+          'Content-Type: application/json'
         ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');

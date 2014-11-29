@@ -49,8 +49,10 @@ class UserIdentityManager extends CFormModel{
       } else {
         $message = 'Please try again';
         if (array_key_exists('_status', $response) &&  $response['_status'] == 'ERR') {
-          $message = $response['issues'][0];
-          if (strpos($message, "field 'email' not unique") !== false) {
+          if (array_key_exists('email', $response['_issues'])) {
+            $message = $response['_issues']['email'];
+          }
+          if (strpos($message, "is not unique") !== false) {
             $message = 'Email id already in use, Please choose a different email id';
           } else {
             $message = 'Some technical problem occurred, contact administrator';
