@@ -28,34 +28,34 @@ class UserIdentityManager extends CFormModel{
     $saveUser['success'] = false;
     try {
       if (empty($userDetail['firstname'])) {
-        throw new Exception('Please enter first name');
+        throw new Exception(Yii::t('discussion', 'Please enter first name'));
       }
       if (empty($userDetail['lastname'])) {
-        throw new Exception('Please enter last name');
+        throw new Exception(Yii::t('discussion', 'Please enter last name'));
       }
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Please enter a valid email');
+        throw new Exception(Yii::t('discussion', 'Please enter a valid email'));
       } 
       if (empty($userDetail['password'])) {
-        throw new Exception('Please enter password');
+        throw new Exception(Yii::t('discussion', 'Please enter password'));
       } 
        
       $user = new UserIdentityAPI();
       $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
       if (array_key_exists('_status', $response) &&  $response['_status'] == 'OK') {
         $saveUser['id'] = $response['_id'];
-        $saveUser['msg'] = 'You have successfully created your account';
+        $saveUser['msg'] = Yii::t('discussion', 'You have successfully created your account');
         $saveUser['success'] = true;
       } else {
-        $message = 'Please try again';
+        $message = Yii::t('discussion', 'Please try again');
         if (array_key_exists('_status', $response) &&  $response['_status'] == 'ERR') {
           if (array_key_exists('email', $response['_issues'])) {
             $message = $response['_issues']['email'];
           }
           if (strpos($message, "is not unique") !== false) {
-            $message = 'Email id already in use, Please choose a different email id';
+            $message = Yii::t('discussion', 'Email id already in use, Please choose a different email id');
           } else {
-            $message = 'Some technical problem occurred, contact administrator';
+            $message = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
           }
         }
         $saveUser['msg'] = $message;
@@ -80,22 +80,22 @@ class UserIdentityManager extends CFormModel{
     $userStatus['success'] = false;
     try {
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Please enter a valid email');
+        throw new Exception(Yii::t('discussion', 'Please enter a valid email'));
       } else {
         $userDetail['email'] = urlencode($userDetail['email']);
       }
       if (empty($userDetail['password'])) {
-        throw new Exception('Please enter password');
+        throw new Exception(Yii::t('discussion', 'Please enter password'));
       } else {
         $userDetail['password'] = urlencode($userDetail['password']);
       }
       $user = new UserIdentityAPI();
       $userStatus = $user->getUserDetail(IDM_USER_ENTITY, $userDetail);
       if (array_key_exists('success', $userStatus) && !$userStatus['success']) {
-        $userStatus['msg'] = 'Some technical problem occurred, contact administrator';
+        $userStatus['msg'] = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
       } else if (array_key_exists('_items', $userStatus)) {
         if (empty($userStatus['_items'])) {
-          $userStatus['msg'] = 'You have entered either wrong email id or password. Please try again';
+          $userStatus['msg'] = Yii::t('discussion', 'You have entered either wrong email id or password. Please try again');
         } else {
           if (array_key_exists('status', $userStatus['_items'][0]) && $userStatus['_items'][0]['status'] == 0) {
             throw new Exception(Yii::t('discussion', 'Please activate you account'));
