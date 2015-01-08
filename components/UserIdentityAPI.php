@@ -34,7 +34,13 @@ class UserIdentityAPI {
     try {
       $userParam = array();
       if (array_key_exists('email', $params) && !empty($params['email'])) {
-        $userParam['email'] = $params['email'];
+        if (is_array($params['email'])) {
+          foreach ($params['email'] as $userId) {
+            $userParam['$or'][] = array('email' => $userId);
+          }
+        } else {
+          $userParam['email'] = $params['email'];
+        }
       }
       if (array_key_exists('password', $params) && !empty($params['password'])) {
         $userParam['password'] = $params['password'];
