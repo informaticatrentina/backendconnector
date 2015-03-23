@@ -41,13 +41,17 @@ class UserIdentityAPI {
       $userParam = array();
       if (array_key_exists('email', $params) && !empty($params['email'])) {
         if (is_array($params['email'])) {
+          $userDetail = array('_items' => array());
           $emailIds = array_chunk($params['email'], 20);
           foreach ($emailIds as $emailId) {
+            $userParam['$or'] = array();
             foreach ($emailId as $userId) {
               $userParam['$or'][] = array('email' => $userId);
             }
             $user = $this->get($function, $userParam, $projection);
-            $userDetail = array_merge($userDetail, $user);
+            if (array_key_exists('_items', $user) && !empty($user['_items'])) {
+              $userDetail['_items'] = array_merge($userDetail['_items'], $user['_items']);
+            }
           }
           goto LAST;
         } else {
@@ -59,13 +63,17 @@ class UserIdentityAPI {
       }
       if (array_key_exists('id', $params) && !empty($params['id'])) {
         if (is_array($params['id'])) {
+          $userDetail = array('_items' => array());
           $userIds = array_chunk($params['id'], 20);
           foreach ($userIds as $ids) {
+            $userParam['$or'] = array();
             foreach ($ids as $userId) {
               $userParam['$or'][] = array('_id' => $userId);
             }
             $user = $this->get($function, $userParam, $projection);
-            $userDetail = array_merge($userDetail, $user);
+            if (array_key_exists('_items', $user) && !empty($user['_items'])) {
+              $userDetail['_items'] = array_merge($userDetail['_items'], $user['_items']);
+            }
           }
           goto LAST;
         } else {
