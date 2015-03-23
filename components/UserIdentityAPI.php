@@ -32,12 +32,24 @@ class UserIdentityAPI {
   function getUserDetail($function, $params = array(), $email = false, $id = false) {
     $userDetail = array();
     try {
+      $projection = '';
+      if ($id) {
+        $projection = '&projection={"_id":1}';
+      } else if ($email) {
+        $projection = '&projection={"email":1}';
+      }
       $userParam = array();
       if (array_key_exists('email', $params) && !empty($params['email'])) {
         if (is_array($params['email'])) {
-          foreach ($params['email'] as $userId) {
-            $userParam['$or'][] = array('email' => $userId);
+          $emailIds = array_chunk($params['email'], 20);
+          foreach ($emailIds as $emailId) {
+            foreach ($emailId as $userId) {
+              $userParam['$or'][] = array('email' => $userId);
+            }
+            $user = $this->get($function, $userParam, $projection);
+            $userDetail = array_merge($userDetail, $user);
           }
+          goto LAST;
         } else {
           $userParam['email'] = $params['email'];
         }
@@ -47,28 +59,49 @@ class UserIdentityAPI {
       }
       if (array_key_exists('id', $params) && !empty($params['id'])) {
         if (is_array($params['id'])) {
-          foreach ($params['id'] as $userId) {
-            $userParam['$or'][] = array('_id' => $userId);
+          $userIds = array_chunk($params['id'], 20);
+          foreach ($userIds as $ids) {
+            foreach ($ids as $userId) {
+              $userParam['$or'][] = array('_id' => $userId);
+            }
+            $user = $this->get($function, $userParam, $projection);
+            $userDetail = array_merge($userDetail, $user);
           }
+          goto LAST;
         } else {
           $userParam['_id'] = $params['id'];
         }
       }
-      $projection = '';
-      if ($id) {
-        $projection = '&projection={"_id":1}';
-      } else if ($email) {
-        $projection = '&projection={"email":1}';
-      }
+      $userDetail = $this->get($function, $userParam, $projection);
+    } catch (Exception $e) {
+      Yii::log('', 'error', 'Error in getUserDetail :' . $e->getMessage());
+      $userDetail['success'] = false;
+      $userDetail['msg'] = $e->getMessage();
+      $userDetail['data'] = '';
+    }
+    LAST:
+    return $userDetail;
+  }
+  
+  /**
+   * get
+   * function is used for send curl get request for getting user data
+   * @param string $function - collection (entry)
+   * @param array $userParam - parameter for getting user detail
+   * @param string $projection - id or email (that you want to get)
+   * @return array $userDetail
+   */
+  public function get($function, $userParam, $projection = '') {
+    try {
       if (!empty($userParam)) {
         $userParam = 'where=' . json_encode($userParam) . $projection;
-        $this->url = $this->baseUrl . $function .'/?'. $userParam;
-      } 
+        $this->url = $this->baseUrl . $function . '/?' . $userParam;
+      }
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->url);
       curl_setopt($ch, CURLOPT_HEADER, 1);
-      curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
-            "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
       ));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
@@ -87,7 +120,7 @@ class UserIdentityAPI {
       }
       $userDetail = json_decode(strstr($this->response, "{"), true);
     } catch (Exception $e) {
-      Yii::log('', 'error', 'Error in curlGet :' . $e->getMessage());
+      Yii::log('get function', 'error', $e->getMessage());
       $userDetail['success'] = false;
       $userDetail['msg'] = $e->getMessage();
       $userDetail['data'] = '';
