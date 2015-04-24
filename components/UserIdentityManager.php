@@ -49,11 +49,16 @@ class UserIdentityManager extends CFormModel{
       } else {
         $message = Yii::t('discussion', 'Please try again');
         if (array_key_exists('_status', $response) &&  $response['_status'] == 'ERR') {
-          if (array_key_exists('email', $response['_issues'])) {
+          if (array_key_exists('nickname', $response['_issues'])) {
+            $message = $response['_issues']['nickname'];
+          } else if (array_key_exists('email', $response['_issues'])) {
             $message = $response['_issues']['email'];
           }
           if (strpos($message, "is not unique") !== false) {
             $message = Yii::t('discussion', 'Email id already in use, Please choose a different email id');
+            if (array_key_exists('nickname', $response['_issues'])) {
+              $message = Yii::t('discussion', 'Nickname already in use, Choose another');
+            }
           } else {
             $message = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
           }
@@ -107,6 +112,9 @@ class UserIdentityManager extends CFormModel{
           }
           if (array_key_exists('lastname', $userStatus['_items'][0]) && !empty($userStatus['_items'][0]['lastname'])) {
              $user['lastname'] = $userStatus['_items'][0]['lastname'];
+          }
+          if (array_key_exists('nickname', $userStatus['_items'][0]) && !empty($userStatus['_items'][0]['nickname'])) {
+             $user['nickname'] = $userStatus['_items'][0]['nickname'];
           }
           if (array_key_exists('email', $userStatus['_items'][0]) && !empty($userStatus['_items'][0]['email'])) {
             $user['email'] = $userStatus['_items'][0]['email'];

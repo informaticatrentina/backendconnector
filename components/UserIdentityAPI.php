@@ -29,7 +29,7 @@ class UserIdentityAPI {
    * @param (string) $function
    * @return (array) $userDetail
    */
-  function getUserDetail($function, $params = array(), $email = false, $id = false) {
+  function getUserDetail($function, $params = array(), $email = false, $id = false, $nickname = false) {
     $userDetail = array();
     try {
       $projection = '';
@@ -37,6 +37,8 @@ class UserIdentityAPI {
         $projection = '&projection={"_id":1}';
       } else if ($email) {
         $projection = '&projection={"email":1}';
+      } else if ($nickname) {
+        $projection = '&projection={"nickname":1}';
       }
       $userParam = array();
       if (array_key_exists('email', $params) && !empty($params['email'])) {
@@ -78,6 +80,25 @@ class UserIdentityAPI {
           goto LAST;
         } else {
           $userParam['_id'] = $params['id'];
+        }
+      }
+      if (array_key_exists('nickname', $params) && !empty($params['nickname'])) {
+        if (is_array($params['nickname'])) {
+          $userDetail = array('_items' => array());
+          $userNicknames = array_chunk($params['nickname'], 20);
+          foreach ($userNicknames as $nicknames) {
+            $userParam['$or'] = array();
+            foreach ($nicknames as $userNickname) {
+              $userParam['$or'][] = array('nickname' => $userNickname);
+            }
+            $user = $this->get($function, $userParam, $projection);
+            if (array_key_exists('_items', $user) && !empty($user['_items'])) {
+              $userDetail['_items'] = array_merge($userDetail['_items'], $user['_items']);
+            }
+          }
+          goto LAST;
+        } else {
+          $userParam['nickname'] = $params['nickname'];
         }
       }
       $userDetail = $this->get($function, $userParam, $projection);
