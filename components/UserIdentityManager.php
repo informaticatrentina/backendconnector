@@ -30,8 +30,11 @@ class UserIdentityManager extends CFormModel{
       if (empty($userDetail['firstname'])) {
         throw new Exception(Yii::t('discussion', 'Please enter first name'));
       }
-      if (empty($userDetail['lastname'])) {
-        throw new Exception(Yii::t('discussion', 'Please enter last name'));
+      if ((array_key_exists('type', $userDetail) && $userDetail['type'] == 'user')
+        || !array_key_exists('type', $userDetail)) {
+        if (empty($userDetail['lastname'])) {
+          throw new Exception(Yii::t('discussion', 'Please enter last name'));
+        }
       }
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception(Yii::t('discussion', 'Please enter a valid email'));
