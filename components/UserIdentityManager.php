@@ -2,9 +2,9 @@
 
 /**
  * UserIdentityManager
- * 
+ *
  * UserIdentityManager class is used for interacting with UserIdentityAPI class.
- * UserIdentityManager class is used for get user detail, create user 
+ * UserIdentityManager class is used for get user detail, create user
  * Copyright (c) 2014 <ahref Foundation -- All rights reserved.
  * Author: Pradeep Kumar <pradeep@incaendo.com>
  * This file is part of <Backendconnector>.
@@ -16,12 +16,12 @@ class UserIdentityManager extends CFormModel{
 
   /**
    * createUser
-   * 
+   *
    * This function is used for create  user
    * @param (array) $userDetail
    * @return (array) $saveUser
    */
-  
+
   public function createUser($userDetail) {
     $saveUser = array();
     $response = array();
@@ -38,11 +38,11 @@ class UserIdentityManager extends CFormModel{
       }
       if (empty($userDetail['email']) || !filter_var($userDetail['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception(Yii::t('discussion', 'Please enter a valid email'));
-      } 
+      }
       if (empty($userDetail['password'])) {
         throw new Exception(Yii::t('discussion', 'Please enter password'));
-      } 
-       
+      }
+
       $user = new UserIdentityAPI();
       $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
       if (array_key_exists('_status', $response) &&  $response['_status'] == 'OK') {
@@ -50,7 +50,6 @@ class UserIdentityManager extends CFormModel{
         $saveUser['msg'] = Yii::t('discussion', 'You have successfully created your account');
         $saveUser['success'] = true;
       } else {
-        $message = Yii::t('discussion', 'Please try again');
         if (array_key_exists('_status', $response) &&  $response['_status'] == 'ERR') {
           if (array_key_exists('nickname', $response['_issues'])) {
             $message = $response['_issues']['nickname'];
@@ -66,6 +65,9 @@ class UserIdentityManager extends CFormModel{
             $message = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
           }
         }
+        else {
+          $message = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
+        }
         $saveUser['msg'] = $message;
       }
     } catch (Exception $e) {
@@ -74,10 +76,10 @@ class UserIdentityManager extends CFormModel{
     }
     return $saveUser;
   }
-  
+
   /**
    * validateUser
-   * 
+   *
    * This function is used for validate user
    * @param (array) $userDetail
    * @return (boolean) $userStatus
@@ -135,16 +137,16 @@ class UserIdentityManager extends CFormModel{
           $userStatus['success'] = true;
         }
       }
-    } catch (Exception $e) {      
+    } catch (Exception $e) {
       $userStatus['msg'] = $e->getMessage();
-      Yii::log('', 'error', 'Error in validateUser method :' . $e->getMessage());      
+      Yii::log('', 'error', 'Error in validateUser method :' . $e->getMessage());
     }
     return $userStatus;
   }
-  
+
   /**
    * setUserDetailInSession
-   * 
+   *
    * This function is used for getting information by userid and store it in session.
    * @param (string) $userId
    * @return (array) $userStatus
@@ -180,7 +182,7 @@ class UserIdentityManager extends CFormModel{
     }
     return $userStatus;
   }
-  
+
   public function curlPut($email) {
     $userIdentityApi = new UserIdentityManager();
         $inputParam = array(
