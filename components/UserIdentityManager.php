@@ -105,7 +105,7 @@ class UserIdentityManager extends CFormModel{
         $userStatus['msg'] = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
       } else if (array_key_exists('_items', $userStatus)) {
         if (empty($userStatus['_items'])) {
-          $userStatus['msg'] = Yii::t('discussion', 'You have entered either wrong email id or password. Please try again');
+          $userStatus['msg'] = Yii::t('discussion', 'Hai inserito una password o email errata.Riprova.');
         } else {
           if (array_key_exists('status', $userStatus['_items'][0]) && $userStatus['_items'][0]['status'] == 0) {
             throw new Exception(Yii::t('discussion', 'Please activate you account'));
