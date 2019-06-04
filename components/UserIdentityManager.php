@@ -46,6 +46,20 @@ class UserIdentityManager extends CFormModel{
       $user = new UserIdentityAPI();
       $response = $user->createUser(IDM_USER_ENTITY, $userDetail);
       if (array_key_exists('_status', $response) &&  $response['_status'] == 'OK') {
+
+        $now = new \DateTime();
+        $now->setTimezone(new \DateTimeZone('Europe/Rome'));
+        
+        // Scrivo file di log
+        if (is_dir(RUNTIME_DIRECTORY)) 
+        {
+          if(is_writable(RUNTIME_DIRECTORY))
+          {
+            $filename = RUNTIME_DIRECTORY.'/registration.txt';
+            file_put_contents($filename, $now->format('Y-m-d H:i:s').' ### '.json_encode($userDetail). PHP_EOL, FILE_APPEND);
+          }
+        }
+
         $saveUser['id'] = $response['_id'];
         $saveUser['msg'] = Yii::t('discussion', 'You have successfully created your account');
         $saveUser['success'] = true;
@@ -105,7 +119,7 @@ class UserIdentityManager extends CFormModel{
         $userStatus['msg'] = Yii::t('discussion', 'Some technical problem occurred, contact administrator');
       } else if (array_key_exists('_items', $userStatus)) {
         if (empty($userStatus['_items'])) {
-          $userStatus['msg'] = Yii::t('discussion', 'Hai inserito una password o email errata.Riprova.');
+          $userStatus['msg'] = Yii::t('discussion', 'You have entered either wrong email id or password. Please try again');
         } else {
           if (array_key_exists('status', $userStatus['_items'][0]) && $userStatus['_items'][0]['status'] == 0) {
             throw new Exception(Yii::t('discussion', 'Please activate you account'));
@@ -192,4 +206,3 @@ class UserIdentityManager extends CFormModel{
         return $userIdentityApi->curlPut($inputParam);
     }
   }
-?>
