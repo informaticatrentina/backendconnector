@@ -10,17 +10,19 @@
  * This file can not be copied and/or distributed without the express permission of
  *  <ahref Foundation.
  */
-         
-class UserIdentityAPI {
+
+class UserIdentityAPI
+{
 
   private $baseUrl;
   private $response;
   private $url;
-  
-  function __construct() {
+
+  function __construct()
+  {
     $this->baseUrl = IDENTITY_MANAGER_API_URL;
   }
-    
+
   /**
    * getUserDetail
    * 
@@ -29,7 +31,9 @@ class UserIdentityAPI {
    * @param (string) $function
    * @return (array) $userDetail
    */
-  function getUserDetail($function, $params = array(), $email = false, $id = false, $nickname = false) {
+
+  function getUserDetail($function, $params = array(), $email = false, $id = false, $nickname = false)
+  {
     $userDetail = array();
     try {
       $projection = '';
@@ -108,10 +112,63 @@ class UserIdentityAPI {
       $userDetail['msg'] = $e->getMessage();
       $userDetail['data'] = '';
     }
-    LAST:
+    LAST: return $userDetail;
+  }
+
+  /**
+   * getLastUserRegistered
+   * 
+   * This function is used for curl request on server using Get method
+   * @param (array) $params
+   * @param (string) $function
+   * @return (array) $userDetail
+   */
+
+  function getLastUserRegistered($function, $params = array(), $email = false, $id = false, $nickname = false)
+  {
+    $userDetail = array();
+    try {
+      $projection = '';
+      if ($id) {
+        $projection = '&projection={"_id":1}';
+      } else if ($email) {
+        $projection = '&projection={"email":1}';
+      } else if ($nickname) {
+        $projection = '&projection={"nickname":1}';
+      }
+      $userParam = array();
+
+      if (array_key_exists('email', $params) && !empty($params['email'])) 
+      {
+        $userParam['email'] = $params['email'];  
+      }      
+
+      $user = $this->get($function, $userParam, $projection);
+      
+      if (array_key_exists('_items', $user) && !empty($user['_items'])) 
+      {
+        if(count($user['_items'])>1)
+        {
+          foreach($user['_items'] as $single_user)
+          {
+            if(!isset($single_user['gdpr_date_del'])) 
+            {
+              if(isset($single_user['_id']['$id'])) $single_user['_id']=$single_user['_id']['$id'];
+              $userDetail['_items'][] = $single_user;
+            }     
+          }
+        }
+        else $userDetail['_items'] = $user['_items'];
+      }
+    } catch (Exception $e) {
+      Yii::log('', 'error', 'Error in getUserDetail :' . $e->getMessage());
+      $userDetail['success'] = false;
+      $userDetail['msg'] = $e->getMessage();
+      $userDetail['data'] = '';
+    }
     return $userDetail;
   }
-  
+
   /**
    * get
    * function is used for send curl get request for getting user data
@@ -120,7 +177,8 @@ class UserIdentityAPI {
    * @param string $projection - id or email (that you want to get)
    * @return array $userDetail
    */
-  public function get($function, $userParam, $projection = '') {
+  public function get($function, $userParam, $projection = '')
+  {
     try {
       if (!empty($userParam)) {
         $userParam = 'where=' . json_encode($userParam) . $projection;
@@ -130,7 +188,7 @@ class UserIdentityAPI {
       curl_setopt($ch, CURLOPT_URL, $this->url);
       curl_setopt($ch, CURLOPT_HEADER, 1);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+        "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
       ));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
@@ -156,7 +214,7 @@ class UserIdentityAPI {
     }
     return $userDetail;
   }
-  
+
   /**
    * createUser
    * 
@@ -164,17 +222,18 @@ class UserIdentityAPI {
    * @param (string) $function
    * @return (array) $return
    */
-  function createUser($function, $params = array()) {
+  function createUser($function, $params = array())
+  {
     $return = array();
     try {
       if (!empty($params)) {
         $data = http_build_query($params);
-        $this->url = $this->baseUrl . $function .'/';
+        $this->url = $this->baseUrl . $function . '/';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
-              "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')    
+          "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
         ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -185,8 +244,8 @@ class UserIdentityAPI {
         $headers = curl_getinfo($ch);
         curl_close($ch);
         //Manage uncorrect response 
-       if ($headers['http_code'] != 200 && $headers['http_code'] != 201 && $headers['http_code'] != 400) {
-         throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
+        if ($headers['http_code'] != 200 && $headers['http_code'] != 201 && $headers['http_code'] != 400) {
+          throw new Exception('Identitity Manager returning httpcode: ' . $headers['http_code']);
         } elseif (!$this->response) {
           throw new Exception('Identitity Manager  is not responding or Curl failed');
         } elseif (strlen($this->response) == 0) {
@@ -211,22 +270,23 @@ class UserIdentityAPI {
    * @param (string) $function
    * @return (array) $userDetail
    */
-  function getUserInfo($function, $userId) {
+  function getUserInfo($function, $userId)
+  {
     $userDetail = array();
     try {
       if (empty($userId)) {
-        return $userDetail;  
+        return $userDetail;
       }
-      $this->url = $this->baseUrl . $function .'/'. $userId;
+      $this->url = $this->baseUrl . $function . '/' . $userId;
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $this->url);
       curl_setopt($ch, CURLOPT_HEADER, 1);
       curl_setopt($ch, CURLOPT_HTTPHEADER,  array(
-            "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
+        "Authorization: Basic " . base64_encode(IDM_API_KEY . ':')
       ));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_TIMEOUT, CURL_TIMEOUT);
-      
+
       $this->response = curl_exec($ch);
       $headers = curl_getinfo($ch);
       curl_close($ch);
@@ -249,12 +309,13 @@ class UserIdentityAPI {
     return $userDetail;
   }
 
-  public function curlPut ($function, $params = array()) {
+  public function curlPut($function, $params = array())
+  {  
     $out = array();
     try {
       if (!empty($params)) {
-        $this->url = $this->baseUrl . $function .'/' . $params['id'] . '/' ;
-        unset( $params['id'] );
+        $this->url = $this->baseUrl . $function . '/' . $params['id'] . '/';
+        unset($params['id']);
         $data = json_encode($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url);
@@ -282,7 +343,7 @@ class UserIdentityAPI {
         $out = json_decode(strstr($this->response, "{"), true);
       }
     } catch (Exception $e) {
-      Yii::log('', ERROR, Yii::t('contest','Error in curlPut :') . $e->getMessage());
+      Yii::log('', ERROR, Yii::t('contest', 'Error in curlPut :') . $e->getMessage());
       $out['success'] = false;
       $out['msg'] = $e->getMessage();
       $out['data'] = '';
