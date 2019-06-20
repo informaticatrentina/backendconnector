@@ -55,8 +55,10 @@ class UserIdentityManager extends CFormModel{
         {
           if(is_writable(RUNTIME_DIRECTORY))
           {
-            $filename = RUNTIME_DIRECTORY.'/registration.txt';
-            file_put_contents($filename, $now->format('Y-m-d H:i:s').' ### '.json_encode($userDetail). PHP_EOL, FILE_APPEND);
+		  $filename = RUNTIME_DIRECTORY.'/registration.txt';
+		  // Fix hide password
+		  $userDetail['password']='******';
+      		  file_put_contents($filename, $now->format('Y-m-d H:i:s').' ### '.json_encode($userDetail). PHP_EOL, FILE_APPEND);
           }
         }
 
