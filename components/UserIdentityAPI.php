@@ -116,6 +116,54 @@ class UserIdentityAPI
   }
 
   /**
+   *  isOrganizationNameAlreadyUsed
+   *
+   *  This function returns if an  organization name is already used
+   *  @param (array) $params
+   *  @param (string) $function
+   *  @return (boolean) $isAlreadyUsed
+   */
+
+   function isOrganizationNameAlreadyUsed($function, $params = array())
+   {
+
+     $retValue=true;  
+     
+     
+     try  
+     {
+
+        if (array_key_exists('firstname', $params) && !empty($params['firstname']))
+        {
+            $userParam['firstname'] = $params['firstname'];
+        }
+
+        $user = $this->get($function, $userParam, '');
+
+        if (array_key_exists('_status', $user) && !empty($user['_status']))
+        {
+            if($user['_status']=="OK") 
+            {
+                return false;
+            }
+            else 
+            {
+                return true;
+            }
+        }
+     }
+     catch(Exception $e) 
+     {
+       Yii::log('', 'error', 'Error in isOrganizationNameAlreadyUsed:' . $e->getMessage());
+     }
+
+    
+     return $retValue;
+   }
+
+
+
+  /**
    * getLastUserRegistered
    * 
    * This function is used for curl request on server using Get method
