@@ -115,6 +115,10 @@ class UserIdentityAPI
     LAST: return $userDetail;
   }
 
+
+
+
+
   /**
    *  isOrganizationNameAlreadyUsed
    *
@@ -160,6 +164,52 @@ class UserIdentityAPI
     
      return $retValue;
    }
+
+
+
+    /**
+     *  isEmailAlreadyUsed
+     *
+     *  This function returns if an email address is already used
+     *  @param (array) $params
+     *  @param (string) $function
+     *  @return (boolean) $isAlreadyUsed
+     */
+
+     function isEmailAlreadyUsed($function, $params = array())
+     {
+        $retValue=true;
+        try
+        {
+            if (array_key_exists('email', $params) && !empty($params['email']))
+            {
+                $userParam['email'] = $params['email'];
+            }
+            $user = $this->get($function, $userParam, '');
+
+            if (array_key_exists('_items', $user) && !empty($user['_items']) && is_array($user['_items']))
+            {
+                if(count($user['_items'])==0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+             }
+         }
+        catch(Exception $e)
+        {
+            Yii::log('', 'error', 'Error in isOrganizationNameAlreadyUsed:' . $e->getMessage());
+        }
+        return $retValue;
+    }
+
+
+
+
+
 
 
 
