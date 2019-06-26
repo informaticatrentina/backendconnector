@@ -201,7 +201,7 @@ class UserIdentityAPI
          }
         catch(Exception $e)
         {
-            Yii::log('', 'error', 'Error in isOrganizationNameAlreadyUsed:' . $e->getMessage());
+            Yii::log('', 'error', 'Error in isEmailAlreadyUsed:' . $e->getMessage());
         }
         return $retValue;
     }
