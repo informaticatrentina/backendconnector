@@ -197,7 +197,14 @@ class UserIdentityAPI
                 {
                     return true;
                 }
-             }
+            }
+
+            if(empty($user['_items']))
+            {
+                return false;
+            }
+
+
          }
         catch(Exception $e)
         {
